@@ -47,29 +47,48 @@ class StartGame:
 
     def get_rounds(self):
         """ gets the value from the input box and checks it is valid and set rounds to the correct number """
-        print("you r in get rounds")
-        num_rounds = 3
+        try:
+            # checks if the user has entered an integer
+            num_rounds = int(self.rounds_input.get())
 
-        # Sends user to to_game and sets infinite mode to "n" and gives the number of rounds the user wants to play
-        self.to_game("n", num_rounds)
+            if 0 < num_rounds <= 100:
+                # Sends user to to_game and sets infinite mode to "n" and gives the number of rounds the user wants to play
+                self.to_game("n", num_rounds)
+                self.rounds_label.configure(text="How many rounds do you want to play?", fg="#000000")
+
+            else:
+                # if the user inputs an invalid integer change the text and text colour of the label to indicate there is an issue
+                self.rounds_label.config(text="Please enter an integer between 0 and 100", fg="#fd7958")
+
+
+        except ValueError:
+            # if the user inputs an invalid integer change the text and text colour of the label to indicate there is an issue
+            self.rounds_label.config(text="Please enter an integer between 0 and 100", fg="#fd7958")
+
 
 
     def to_game(self, unlimited_mode, num_rounds=0):
         """ sends user to the PlayGame class """
-        # Create global to hold if the game is currently in infinite mode
         global unlimited
         unlimited = unlimited_mode
-        print("unlimited mode =", unlimited)
-        print("num rounds =", num_rounds)
 
-        PlayGame()
+        # sends user to the game gui and sends how many rounds they want to play
+        PlayGame(num_rounds)
+
+        # remove box for number of games select
+        root.withdraw()
 
 
 class PlayGame:
 
-    def __init__(self):
+    def __init__(self, rounds):
         """ create the gui for the game and set up all the buttons and variables """
 
+
+
+
+# Create global variable to hold if the game is currently in infinite mode
+unlimited = ""
 
 if __name__ == "__main__":
     root = Tk()
