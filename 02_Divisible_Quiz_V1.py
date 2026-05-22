@@ -66,7 +66,6 @@ class StartGame:
             self.rounds_label.config(text="Please enter an integer between 0 and 100", fg="#fd7958")
 
 
-
     def to_game(self, unlimited_mode, num_rounds=0):
         """ sends user to the PlayGame class """
         global unlimited
@@ -82,9 +81,53 @@ class StartGame:
 class PlayGame:
 
     def __init__(self, rounds):
-        """ create the gui for the game and set up all the buttons and variables """
+        """ create the GUI for the game and set up all the buttons and variables """
 
+        # initialize 'self.' variables
 
+        # setup dialogue box
+        self.play_box = Toplevel()
+
+        # creates a grid to hold the all the button in the play game GUI
+        self.play_frame = Frame(self.play_box, padx=10, pady=10)
+        self.play_frame.grid()
+
+        # Create question left label
+        self.question_num_label = Label(self.play_frame, text="Question # of #\n# Questions left", font="Arial 24 bold")
+        self.question_num_label.grid()
+
+        self.question_label = Label(self.play_frame, text="# Can be divided by #", font="Arial 16")
+        self.question_label.grid(row=1)
+
+        self.true_false_frame = Frame(self.play_frame)
+        self.true_false_frame.grid(row=2)
+
+        self.true_button = Button(self.true_false_frame, text="True", bg="#54fd81", font="Arial 16 bold", height=2, width=20)
+        self.true_button.grid(row=0, column=0, padx=5, pady=5)
+
+        self.false_button = Button(self.true_false_frame, text="False", bg="#fd7958", font="Arial 16 bold", height=2, width=20)
+        self.false_button.grid(row=0, column=1, padx=5, pady=5)
+
+        self.result_label = Label(self.play_frame, text="Results will show here", font="Arial 16")
+        self.result_label.grid(row=3)
+
+        self.score_label = Label(self.play_frame, text="Current score: # / #", font="Arial 16")
+        self.score_label.grid(row=4)
+
+        self.nav_frame = Frame(self.play_frame)
+        self.nav_frame.grid(row=5)
+
+        self.hints_button = Button(self.nav_frame, text="Hints", bg="#229afd", font="Arial 16 bold", height=2, width=20)
+        self.hints_button.grid(row=0, column=0, padx=5, pady=5)
+
+        self.next_button = Button(self.nav_frame, text="Next ==>", bg="#229afd", font="Arial 16 bold", height=2, width=20)
+        self.next_button.grid(row=0, column=1, padx=5, pady=5)
+
+        self.stats_button = Button(self.nav_frame, text="Stats", bg="#229afd", font="Arial 16 bold", height=2, width=20)
+        self.stats_button.grid(row=1, column=0, padx=5, pady=5)
+
+        self.quit_button = Button(self.nav_frame, text="Quit this quiz", bg="#229afd", font="Arial 16 bold", height=2, width=20)
+        self.quit_button.grid(row=1, column=1, padx=5, pady=5)
 
 
 # Create global variable to hold if the game is currently in infinite mode
