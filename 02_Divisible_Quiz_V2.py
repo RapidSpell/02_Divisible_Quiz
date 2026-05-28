@@ -117,40 +117,66 @@ class PlayGame:
         self.nav_frame = Frame(self.play_frame)
         self.nav_frame.grid(row=5)
 
-        # Create question left label
-        self.question_num_label = Label(self.play_frame, text="Question # of #\n# Questions left", font="Arial 24 bold")
-        self.question_num_label.grid()
+        # Reference list to make the labels for the start game Gui
+        # Format [text, font, row]
+        play_labels_ref = [
+            ["Question # of #\n# Questions left", "Arial 24 bold", 0],
+            ["# Can be divided by #", "Arial 16", 1],
+            ["Results will show here", "Arial 16", 3],
+            ["Current score: # / #", "Arial 16", 4]
+        ]
 
-        self.question_label = Label(self.play_frame, text="# Can be divided by #", font="Arial 16")
-        self.question_label.grid(row=1)
+        # Make list to hold all the start labels after being made to be named after
+        self.play_labels = []
 
-        self.true_button = Button(self.true_false_frame, text="True", bg="#54fd81", font="Arial 16 bold", height=2,
-                                  width=20)
-        self.true_button.grid(row=0, column=0, padx=5, pady=5)
+        for label in play_labels_ref:
+            self.made_label = Label(self.play_frame, text=label[0], font=label[1])
+            self.made_label.grid(row=label[2])
 
-        self.false_button = Button(self.true_false_frame, text="False", bg="#fd7958", font="Arial 16 bold", height=2,
-                                   width=20)
-        self.false_button.grid(row=0, column=1, padx=5, pady=5)
+            self.play_labels.append(self.made_label)
 
-        self.result_label = Label(self.play_frame, text="Results will show here", font="Arial 16")
-        self.result_label.grid(row=3)
+        # Reference list to make the buttons for the start game Gui
+        # Format [frame, text, width, background, command, row, column]
+        play_buttons_ref = [
+            [self.true_false_frame, "True", 20, "#54fd81", lambda: self.to_ans_check("t"), 0, 0,],
+            [self.true_false_frame, "False", 20, "#fd7958", lambda: self.to_ans_check("f"), 0, 1,],
+            [self.nav_frame, "Hints", 20, "#229afd", self.to_hints, 0, 0],
+            [self.nav_frame, "Next ==>", 20, "#229afd", self.next_round, 0, 1],
+            [self.nav_frame, "Stats", 20, "#229afd", self.to_stats, 1, 0],
+            [self.nav_frame, "Quit this quiz", 20, "#229afd", self.quit_game(), 1, 1]
+        ]
 
-        self.score_label = Label(self.play_frame, text="Current score: # / #", font="Arial 16")
-        self.score_label.grid(row=4)
+        # Make list to hold all the start buttons after being made to be named after
+        self.play_buttons = []
 
-        self.hints_button = Button(self.nav_frame, text="Hints", bg="#229afd", font="Arial 16 bold", height=2, width=20)
-        self.hints_button.grid(row=0, column=0, padx=5, pady=5)
+        for button in play_buttons_ref:
+            self.made_button = Button(button[0], text=button[1], font="Arial 16", width=button[2], bg=button[3],
+                                      command=button[4])
+            self.made_button.grid(row=button[5], column=button[6], padx=5, pady=5)
 
-        self.next_button = Button(self.nav_frame, text="Next ==>", bg="#229afd", font="Arial 16 bold", height=2,
-                                  width=20)
-        self.next_button.grid(row=0, column=1, padx=5, pady=5)
+            self.play_buttons.append(self.made_button)
 
-        self.stats_button = Button(self.nav_frame, text="Stats", bg="#229afd", font="Arial 16 bold", height=2, width=20)
-        self.stats_button.grid(row=1, column=0, padx=5, pady=5)
+    def to_ans_check(self, response):
+        if response == "t":
+            print("u have pressed true")
+        else:
+            print("u have pressed false")
 
-        self.quit_button = Button(self.nav_frame, text="Quit this quiz", bg="#229afd", font="Arial 16 bold", height=2,
-                                  width=20)
-        self.quit_button.grid(row=1, column=1, padx=5, pady=5)
+
+    def to_hints(self):
+        print("you are in to hints")
+
+
+    def to_stats(self):
+        print("you are in to stats")
+
+
+    def next_round(self):
+        print("you are in next round")
+
+
+    def quit_game(self):
+        print("you are in quit game")
 
 
 # Create global variable to hold if the game is currently in infinite mode
