@@ -100,6 +100,11 @@ class PlayGame:
         """ create the GUI for the game and set up all the buttons and variables """
 
         # Initialize 'self.' variables
+        self.total_rounds = rounds
+
+        # rounds left - initialize it as num rounds when first round is played
+        self.rounds_left = IntVar()
+        self.rounds_left.set(self.total_rounds)
 
         # Setup dialogue box
         self.play_box = Toplevel()
@@ -135,15 +140,22 @@ class PlayGame:
 
             self.play_labels.append(self.made_label)
 
+        # name the labels so they can be configured later
+        self.question_num_label = self.play_labels[0]
+        self.question_label = self.play_labels[1]
+        self.result_label = self.play_labels[2]
+        self.score_label = self.play_labels[3]
+
+
         # Reference list to make the buttons for the start game Gui
         # Format [frame, text, width, background, command, row, column]
         play_buttons_ref = [
             [self.true_false_frame, "True", 20, "#54fd81", lambda: self.to_ans_check("t"), 0, 0,],
             [self.true_false_frame, "False", 20, "#fd7958", lambda: self.to_ans_check("f"), 0, 1,],
             [self.nav_frame, "Hints", 20, "#229afd", self.to_hints, 0, 0],
-            [self.nav_frame, "Next ==>", 20, "#229afd", self.next_round, 0, 1],
+            [self.nav_frame, "Next Round ==>", 20, "#229afd", self.new_round, 0, 1],
             [self.nav_frame, "Stats", 20, "#229afd", self.to_stats, 1, 0],
-            [self.nav_frame, "Quit this quiz", 20, "#229afd", self.quit_game(), 1, 1]
+            [self.nav_frame, "Quit this quiz", 20, "#229afd", self.quit_game, 1, 1]
         ]
 
         # Make list to hold all the start buttons after being made to be named after
@@ -155,6 +167,22 @@ class PlayGame:
             self.made_button.grid(row=button[5], column=button[6], padx=5, pady=5)
 
             self.play_buttons.append(self.made_button)
+
+        self.new_round()
+
+
+    def new_round(self):
+        """ edits the labels to display the correct information and questions"""
+        # if not in unlimited mode take one off of rounds left
+        if unlimited == "n":
+            self.rounds_left.set(self.rounds_left.get() - 1)
+            print("nunmonfsd")
+
+        print("houses")
+
+        # configure the labels
+        self.question_num_label.config(text=f"Question {self.total_rounds - self.rounds_left.get()} of {self.total_rounds}\n{self.rounds_left.get()} Questions left")
+
 
     def to_ans_check(self, response):
         if response == "t":
@@ -169,10 +197,6 @@ class PlayGame:
 
     def to_stats(self):
         print("you are in to stats")
-
-
-    def next_round(self):
-        print("you are in next round")
 
 
     def quit_game(self):
