@@ -176,13 +176,15 @@ class PlayGame:
         # if not in unlimited mode take one off of rounds left
         if unlimited == "n":
             self.rounds_left.set(self.rounds_left.get() - 1)
-            print("nunmonfsd")
 
-        print("houses")
+            # configure the labels
+            self.question_num_label.config(text=f"Question {self.total_rounds - self.rounds_left.get()} of {self.total_rounds}\n{self.rounds_left.get()} Questions left")
+        
+        else:
+            self.question_num_label.config(
+                text=f"You are playing infinite mode")
 
-        # configure the labels
-        self.question_num_label.config(text=f"Question {self.total_rounds - self.rounds_left.get()} of {self.total_rounds}\n{self.rounds_left.get()} Questions left")
-
+        # create answer
 
     def to_ans_check(self, response):
         if response == "t":
@@ -200,7 +202,12 @@ class PlayGame:
 
 
     def quit_game(self):
-        print("you are in quit game")
+        """ sends user back to the start GUI """
+        # open start gui
+        root.deiconify()
+
+        # close game tab
+        self.play_box.destroy()
 
 
 # Create global variable to hold if the game is currently in infinite mode
