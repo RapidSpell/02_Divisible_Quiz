@@ -1,4 +1,5 @@
 from tkinter import *
+import random
 
 
 # Classes start here
@@ -106,6 +107,16 @@ class PlayGame:
         self.rounds_left = IntVar()
         self.rounds_left.set(self.total_rounds)
 
+        # variable to save how many correct answers the user has put
+        self.ans_correct = 0
+
+        # variable to hold if the current question it true of false
+        self.true_false = int
+
+        # variable to hold the divisor and dividend
+        self.divisor = int
+        self.dividend = int
+
         # Setup dialogue box
         self.play_box = Toplevel()
 
@@ -184,14 +195,58 @@ class PlayGame:
             self.question_num_label.config(
                 text=f"You are playing infinite mode")
 
-        # create answer
+
+        # decide if it is going to be true of false
+        self.true_false = random.randint(0, 1)
+
+        # Choose number to divide by
+        self.divisor = random.randint(1, 10)
+
+        # if answer is going to be true (true_false = 0) find a multiple of the divisor
+        if self.true_false == 0:
+            self.dividend = self.divisor * random.randint(1, 10)
+
+        else:
+            while True:
+                temp_dividend = random.randint(1,100)
+                print("initial", temp_dividend)
+
+                try:
+                    correct = int(temp_dividend / self.divisor)
+
+                    self.dividend = temp_dividend
+                    break
+
+                except ValueError:
+                    print("failed")
+
+        # configure the question label
+        self.question_label.config(text=f"{self.dividend} Can be divided by {self.divisor}")
+
+
+
 
     def to_ans_check(self, response):
+        """ check if the user pressed the right answer"""
+        # If the user pressed true
         if response == "t":
-            print("u have pressed true")
-        else:
-            print("u have pressed false")
+            # If the user was correct
+            if self.true_false == 0:
+                self.result_label.config(text=f"{self.dividend} CAN be divided by {self.divisor}", bg="#54fd81")
+                self.ans_correct += 1
 
+            else:
+                self.result_label.config(text=f"{self.dividend} CANT be divided by {self.divisor}", bg="#fd7958")
+
+        # If the user pressed  false
+        else:
+            # If the user was correct
+            if self.true_false == 1:
+                self.result_label.config(text=f"{self.dividend} CANT be divided by {self.divisor}", bg="#54fd81")
+                self.ans_correct += 1
+
+            else:
+                self.result_label.config(text=f"{self.dividend} CAN be divided by {self.divisor}", bg="#fd7958")
 
     def to_hints(self):
         print("you are in to hints")
