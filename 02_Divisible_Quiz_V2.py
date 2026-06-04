@@ -103,9 +103,9 @@ class PlayGame:
         # Initialize 'self.' variables
         self.total_rounds = rounds
 
-        # rounds left - initialize it as num rounds when first round is played
-        self.rounds_left = IntVar()
-        self.rounds_left.set(self.total_rounds)
+        # Variable to hold how many rounds have been played
+        self.rounds_played = IntVar()
+        self.rounds_played.set(0)
 
         # variable to save how many correct answers the user has put
         self.ans_correct = 0
@@ -116,6 +116,7 @@ class PlayGame:
         # variable to hold the divisor and dividend
         self.divisor = int
         self.dividend = int
+        self.result = int
 
         # Setup dialogue box
         self.play_box = Toplevel()
@@ -179,17 +180,39 @@ class PlayGame:
 
             self.play_buttons.append(self.made_button)
 
+        # Name the buttons so they can be configured later
+        self.true_button = self.play_buttons[0]
+        self.false_button = self.play_buttons[1]
+
+        self.next_button = self.play_buttons[3]
+        self.stats_button = self.play_buttons[4]
+
+        # send user the user to new_round function to start the game
         self.new_round()
 
 
     def new_round(self):
         """ edits the labels to display the correct information and questions"""
-        # if not in unlimited mode take one off of rounds left
-        if unlimited == "n":
-            self.rounds_left.set(self.rounds_left.get() - 1)
+        # unable True and False buttons and disable the next button
+        self.true_button.config(state=NORMAL)
+        self.false_button.config(state=NORMAL)
+        self.next_button.config(state=DISABLED)
 
+        # if the user is on their first round disable the stats button
+        if self.rounds_played.get() == 0:
+            self.stats_button.config(state=DISABLED)
+
+        # if user is no longer on the first round enable the stats button
+        else:
+            self.stats_button.config(state=NORMAL)
+
+        # add one to rounds played
+        self.rounds_played.set(self.rounds_played.get() + 1)
+
+        # setup questions left label if not in unlimited mode
+        if unlimited == "n":
             # configure the labels
-            self.question_num_label.config(text=f"Question {self.total_rounds - self.rounds_left.get()} of {self.total_rounds}\n{self.rounds_left.get()} Questions left")
+            self.question_num_label.config(text=f"Question {self.rounds_played.get()} of {self.total_rounds}\n{self.total_rounds - self.rounds_played.get()} Questions left")
         
         else:
             self.question_num_label.config(
@@ -209,7 +232,6 @@ class PlayGame:
         else:
             while True:
                 temp_dividend = random.randint(1,100)
-                print("initial", temp_dividend)
 
                 try:
                     correct = int(temp_dividend / self.divisor)
@@ -223,30 +245,46 @@ class PlayGame:
         # configure the question label
         self.question_label.config(text=f"{self.dividend} Can be divided by {self.divisor}")
 
-
+        self.result = self.dividend / self.divisor
+        print(self.result)
 
 
     def to_ans_check(self, response):
         """ check if the user pressed the right answer"""
+
+        # when the user has pressed true or false disable true and false buttons
+        self.true_button.config(state=DISABLED)
+        self.false_button.config(state=DISABLED)
+
+        # if the user not on their last round enable the next button  so they can continue to the next question
+        if self.total_rounds - self.rounds_played.get() != 0 or unlimited == "y":
+            self.next_button.config(state=NORMAL)
+
+        else:
+            self.next_button.config(text="This is your last round")
+
         # If the user pressed true
         if response == "t":
             # If the user was correct
             if self.true_false == 0:
-                self.result_label.config(text=f"{self.dividend} CAN be divided by {self.divisor}", bg="#54fd81")
+                self.result_label.config(text=f"{self.dividend} CAN be divided by {self.divisor} the answer is {self.result}", bg="#54fd81")
                 self.ans_correct += 1
 
             else:
-                self.result_label.config(text=f"{self.dividend} CANT be divided by {self.divisor}", bg="#fd7958")
+                self.result_label.config(text=f"{self.dividend} CANT be divided by {self.divisor} the answer is {self.result}", bg="#fd7958")
 
-        # If the user pressed  false
+        # If the user pressed false
         else:
             # If the user was correct
             if self.true_false == 1:
-                self.result_label.config(text=f"{self.dividend} CANT be divided by {self.divisor}", bg="#54fd81")
+                self.result_label.config(text=f"{self.dividend} CANT be divided by {self.divisor} the answer is {self.result}", bg="#54fd81")
                 self.ans_correct += 1
 
             else:
-                self.result_label.config(text=f"{self.dividend} CAN be divided by {self.divisor}", bg="#fd7958")
+                self.result_label.config(text=f"{self.dividend} CAN be divided by {self.divisor} the answer is {self.result}", bg="#fd7958")
+
+            # configue the current score label
+
 
     def to_hints(self):
         print("you are in to hints")
