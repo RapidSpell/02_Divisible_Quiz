@@ -165,7 +165,7 @@ class PlayGame:
             [self.true_false_frame, "True", 20, "#54fd81", lambda: self.to_ans_check("t"), 0, 0,],
             [self.true_false_frame, "False", 20, "#fd7958", lambda: self.to_ans_check("f"), 0, 1,],
             [self.nav_frame, "Hints", 20, "#229afd", self.to_hints, 0, 0],
-            [self.nav_frame, "Next Round ==>", 20, "#229afd", self.new_round, 0, 1],
+            [self.nav_frame, "Next Question ==>", 20, "#229afd", self.new_round, 0, 1],
             [self.nav_frame, "Stats", 20, "#229afd", self.to_stats, 1, 0],
             [self.nav_frame, "Quit this quiz", 20, "#229afd", self.quit_game, 1, 1]
         ]
@@ -283,11 +283,13 @@ class PlayGame:
             else:
                 self.result_label.config(text=f"{self.dividend} CAN be divided by {self.divisor} the answer is {self.result}", bg="#fd7958")
 
-            # configue the current score label
+        # configure the current score label
+        self.score_label.config(text=f"current score: {self.ans_correct}/{self.rounds_played.get()}")
 
 
     def to_hints(self):
-        print("you are in to hints")
+        """ sends user to the Hints class so it displays the hints GUI"""
+        Hints(self)
 
 
     def to_stats(self):
@@ -301,6 +303,13 @@ class PlayGame:
 
         # close game tab
         self.play_box.destroy()
+
+
+class Hints:
+    def __init__(self, partner):
+        """ create GUI and labels in the hints page """
+
+        print("success")
 
 
 # Create global variable to hold if the game is currently in infinite mode
