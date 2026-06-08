@@ -227,20 +227,25 @@ class PlayGame:
 
         # if answer is going to be true (true_false = 0) find a multiple of the divisor
         if self.true_false == 0:
+            print("is true")
             self.dividend = self.divisor * random.randint(1, 10)
 
         else:
+            print("is false")
+
             while True:
                 temp_dividend = random.randint(1,100)
 
-                try:
-                    correct = int(temp_dividend / self.divisor)
-
+                correct = temp_dividend / self.divisor
+                int_check = isinstance(correct, int)
+                print(int_check)
+                if int_check:
                     self.dividend = temp_dividend
-                    break
 
-                except ValueError:
+                else:
                     print("failed")
+
+                break
 
         # configure the question label
         self.question_label.config(text=f"{self.dividend} Can be divided by {self.divisor}")
@@ -288,7 +293,8 @@ class PlayGame:
 
 
     def to_hints(self):
-        print("you are in to hints")
+        """ sends user to the Hints class so it displays the hints GUI"""
+        Hints(self)
 
 
     def to_stats(self):
