@@ -223,7 +223,12 @@ class PlayGame:
         self.true_false = random.randint(0, 1)
 
         # Choose number to divide by
-        self.divisor = random.randint(1, 10)
+        if self.true_false == 0:
+            self.divisor = random.randint(1, 10)
+
+        # if the question is going to be false divisor cannot be 1 because every whole number is divisible by one
+        else:
+            self.divisor = random.randint(2, 10)
 
         # if answer is going to be true (true_false = 0) find a multiple of the divisor
         if self.true_false == 0:
@@ -236,16 +241,13 @@ class PlayGame:
             while True:
                 temp_dividend = random.randint(1,100)
 
-                correct = temp_dividend / self.divisor
-                int_check = isinstance(correct, int)
-                print(int_check)
-                if int_check:
+                if temp_dividend / self.divisor != int(temp_dividend / self.divisor):
+
                     self.dividend = temp_dividend
+                    break
 
                 else:
                     print("failed")
-
-                break
 
         # configure the question label
         self.question_label.config(text=f"{self.dividend} Can be divided by {self.divisor}")
@@ -293,8 +295,7 @@ class PlayGame:
 
 
     def to_hints(self):
-        """ sends user to the Hints class so it displays the hints GUI"""
-        Hints(self)
+        print("you are in to hints")
 
 
     def to_stats(self):
@@ -308,13 +309,6 @@ class PlayGame:
 
         # close game tab
         self.play_box.destroy()
-
-
-class Hints:
-    def __init__(self, partner):
-        """ create GUI and labels in the hints page """
-
-        print("success")
 
 
 # Create global variable to hold if the game is currently in infinite mode
