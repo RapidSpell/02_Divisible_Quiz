@@ -1,7 +1,7 @@
 import random
 
 
-def hi():
+def check_v1():
     x = random.randint(10, 100)
     x = x / random.randint(1, 10)
 
@@ -17,6 +17,21 @@ def hi():
 
     return x
 
+def check_v2():
+    x = random.randint(10, 100)
+    x = x / random.randint(1, 10)
+
+    print(x)
+
+    if x == int(x):
+        print("true")
+
+    else:
+        print("failed")
+
+    return x
+
+
 while True:
     print("""
     
@@ -24,4 +39,4 @@ while True:
     """)
     go = input("go? ")
     if go == "y":
-        g = hi()
+        g = check_v2()
