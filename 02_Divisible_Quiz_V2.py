@@ -304,13 +304,6 @@ class PlayGame:
         self.play_box.destroy()
 
 
-class Hints:
-    def __init__(self, partner):
-        """ create GUI and labels in the hints page """
-
-        print("success")
-
-
 # Create global variable to hold if the game is currently in infinite mode
 unlimited = ""
 

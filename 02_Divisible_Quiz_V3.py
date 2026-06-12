@@ -1,5 +1,7 @@
+from pstats import Stats
 from tkinter import *
 import random
+from functools import partial
 
 
 # Classes start here
@@ -183,7 +185,7 @@ class PlayGame:
         # Name the buttons so they can be configured later
         self.true_button = self.play_buttons[0]
         self.false_button = self.play_buttons[1]
-
+        self.hints_button = self.play_buttons[2]
         self.next_button = self.play_buttons[3]
         self.stats_button = self.play_buttons[4]
 
@@ -295,11 +297,19 @@ class PlayGame:
 
 
     def to_hints(self):
-        print("you are in to hints")
+        """ Sends user to hints GUI and disables hints button """
+        # Disable hints button so multiple hint GUI's cannot be created
+        self.hints_button.config(state=DISABLED)
+
+        Hints(self)
 
 
     def to_stats(self):
-        print("you are in to stats")
+        """ sends user to stats GUI and disables the stats button """
+        # Disables stats button
+        self.stats_button.config(state=DISABLED)
+
+        RoundStats(self)
 
 
     def quit_game(self):
@@ -309,6 +319,112 @@ class PlayGame:
 
         # close game tab
         self.play_box.destroy()
+
+
+class Hints:
+    def __init__(self, partner):
+        """ create GUI and labels in the hints page """
+
+        # Create box to hold hints labels
+        self.hints_box = Toplevel(bg="#FFE6CC")
+
+        # if users press cross at the top, coses help and
+        # 'releases' help button
+        self.hints_box.protocol("WM_DELETE_WINDOW",
+                               partial(self.close_hints, partner))
+
+        # Create a coloured frame to hold the labels
+        self.hints_frame = Frame(self.hints_box, bg="#FFE6CC")
+        self.hints_frame.grid(padx=10, pady=10)
+
+        # Create labels for hints
+        self.hints_intro_label = Label(self.hints_frame, text="If you are struggling with this quiz you've\ncome to the right place.\n\n"
+                                                              "For certain divisions there is rules that you\n"
+                                                              "can use to help you, bellow are the rules for\n"
+                                                              "divisions up to 10:", bg="#FFE6CC", font="Arial 16")
+        self.hints_intro_label.grid(row=0)
+
+        self.rules_label = Label(self.hints_frame, text="""1. every whole number is divisible by 1 (this game will only\ngive you whole numbers)
+2. if the last digit is even (0, 2, 4, 6, 8)
+3. the sum of the digits is divisible by 3 (126, 1+2+6 = 9,\n9/3 = whole number therefore 126 is divisible by 9)
+4. if the last 2 digits are divisible by 4
+5. if the last digit is 0 or 5
+6. if the number is divisible by 3 and 2
+7. there is no simple rules for divisions by 7
+8. the last 3 digits of the number are divisible by 8
+9. sum of digits is divisible by 9
+10. if final digit is 0""", bg="#FFE6CC", font="Arial 12")
+        self.rules_label.grid(row=1)
+
+        self.gl_label = Label(self.hints_frame, text="I hope this helps and Good Luck!", bg="#FFE6CC", font="Arial 16")
+        self.gl_label.grid(row=2)
+
+        self.return_button = Button(self.hints_frame, text="Return", bg="#229afd", font="Arial 16", padx=20, pady=5,
+                                    command=lambda: self.close_hints(partner))
+        self.return_button.grid(row=3)
+
+
+    def close_hints(self, partner):
+        """ close the hints GUI """
+        self.hints_box.destroy()
+
+        partner.hints_button.config(state=NORMAL)
+
+
+class RoundStats:
+    def __init__(self, partner):
+        """ Opens a GUI to show the stats and the export results button """
+        # Create a box to hold all the boxes in the stats GUI
+        self.stats_box = Toplevel()
+
+        # if users press cross at the top, coses help and
+        # 'releases' help button
+        self.stats_box.protocol("WM_DELETE_WINDOW",
+                                partial(self.close_stats, partner))
+
+        # create frame to hold everything it the stats GUI
+        self.stats_frame = Frame(self.stats_box)
+        self.stats_frame.grid(padx=10, pady=10)
+
+        # Create title label
+        self.stats_title_label = Label(self.stats_frame, text="Stats/Export", font="Arial 20")
+        self.stats_title_label.grid(row=0)
+
+        # Create frame to hold all the stats
+        self.result_frame = Frame(self.stats_frame, bg="#FFE6CC", padx=10, pady=10)
+        self.result_frame.grid(row=1)
+
+        # Create frame to hold answers correct label and win rate label next to each other
+        self.result_stats_frame = Frame(self.result_frame, bg="#FFE6CC", padx=10, pady=10)
+        self.result_stats_frame.grid(row=0)
+
+        # Create label to show answers correct
+        self.ans_correct_label = Label(self.result_stats_frame, text="Answers Correct:\n#/#", font="Arial 16", bg="#FFE6CC")
+        self.ans_correct_label.grid(row=0, column=0, padx=10)
+
+        # Create label to show win rate
+        self.win_rate_label = Label(self.result_stats_frame, text="Win Rate:\n##%", font="Arial 16", bg="#FFE6CC")
+        self.win_rate_label.grid(row=0, column=1, padx=10)
+
+        # Create a Label to show the most recent questions and answers
+        self.history_label = Label(self.result_frame, text="History:\n*history is shown here*", font="Arial 16", bg="#FFE6CC")
+        self.history_label.grid(row=1, column=0)
+
+        # frame to hold the return and the export button
+        self.stats_nav_frame = Frame(self.stats_frame)
+        self.stats_nav_frame.grid(row=2)
+
+        # Create button to close stats
+        self.stats_return_button = Button(self.stats_nav_frame, text="Return", width=20, bg="#229afd",
+                                          command=lambda: self.close_stats(partner), font="Arial 20")
+        self.stats_return_button.grid(row=0, column=0)
+
+
+    def close_stats(self, partner):
+        """ closes the stats GUI and enables the stats button """
+        self.stats_box.destroy()
+
+        partner.stats_button.config(state=NORMAL)
 
 
 # Create global variable to hold if the game is currently in infinite mode
