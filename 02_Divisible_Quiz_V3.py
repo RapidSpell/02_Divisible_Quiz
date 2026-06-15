@@ -1,4 +1,3 @@
-from pstats import Stats
 from tkinter import *
 import random
 from functools import partial
@@ -120,6 +119,12 @@ class PlayGame:
         self.dividend = int
         self.result = int
 
+        # create a list to hold the history [[question, user answer, correct/incorrect], [question, user answer, correct/incorrect], ...]
+        self.history = []
+
+        # variable to hold the round history to be appended to the main history list after
+        self.temp_round_history = []
+
         # Setup dialogue box
         self.play_box = Toplevel()
 
@@ -204,12 +209,10 @@ class PlayGame:
         if self.rounds_played.get() == 0:
             self.stats_button.config(state=DISABLED)
 
-        # if user is no longer on the first round enable the stats button
-        else:
-            self.stats_button.config(state=NORMAL)
-
         # add one to rounds played
         self.rounds_played.set(self.rounds_played.get() + 1)
+
+
 
         # setup questions left label if not in unlimited mode
         if unlimited == "n":
@@ -232,14 +235,12 @@ class PlayGame:
         else:
             self.divisor = random.randint(2, 10)
 
-        # if answer is going to be true (true_false = 0) find a multiple of the divisor
+        # if answer is going to be true (true_false = 0) generate a multiple of the divisor for the dividend
         if self.true_false == 0:
-            print("is true")
             self.dividend = self.divisor * random.randint(1, 10)
 
         else:
-            print("is false")
-
+            # loop to keep trying to find a number that can be divided by the divisor
             while True:
                 temp_dividend = random.randint(1,100)
 
@@ -248,14 +249,16 @@ class PlayGame:
                     self.dividend = temp_dividend
                     break
 
-                else:
-                    print("failed")
+        # create the question text
+        q_text = f"{self.dividend} Can be divided by {self.divisor}"
 
         # configure the question label
-        self.question_label.config(text=f"{self.dividend} Can be divided by {self.divisor}")
+        self.question_label.config(text=q_text)
+
+        # add the question to the temp history list
+        self.temp_round_history.append(q_text)
 
         self.result = self.dividend / self.divisor
-        print(self.result)
 
 
     def to_ans_check(self, response):
@@ -264,6 +267,12 @@ class PlayGame:
         # when the user has pressed true or false disable true and false buttons
         self.true_button.config(state=DISABLED)
         self.false_button.config(state=DISABLED)
+
+        # now the user has answered 1 question enable the stats button
+        self.stats_button.config(state=NORMAL)
+
+        # add the users response to the temp round history list
+        self.temp_round_history.append(response)
 
         # if the user not on their last round enable the next button  so they can continue to the next question
         if self.total_rounds - self.rounds_played.get() != 0 or unlimited == "y":
@@ -278,9 +287,11 @@ class PlayGame:
             if self.true_false == 0:
                 self.result_label.config(text=f"{self.dividend} CAN be divided by {self.divisor} the answer is {self.result}", bg="#54fd81")
                 self.ans_correct += 1
+                self.temp_round_history.append("correct")
 
             else:
                 self.result_label.config(text=f"{self.dividend} CANT be divided by {self.divisor} the answer is {self.result}", bg="#fd7958")
+                self.temp_round_history.append("incorrect")
 
         # If the user pressed false
         else:
@@ -288,9 +299,15 @@ class PlayGame:
             if self.true_false == 1:
                 self.result_label.config(text=f"{self.dividend} CANT be divided by {self.divisor} the answer is {self.result}", bg="#54fd81")
                 self.ans_correct += 1
+                self.temp_round_history.append("correct")
 
             else:
                 self.result_label.config(text=f"{self.dividend} CAN be divided by {self.divisor} the answer is {self.result}", bg="#fd7958")
+                self.temp_round_history.append("incorrect")
+
+        # add the temp round history to the main history
+        self.history.append(self.temp_round_history)
+        self.temp_round_history = []
 
         # configure the current score label
         self.score_label.config(text=f"current score: {self.ans_correct}/{self.rounds_played.get()}")
@@ -309,7 +326,7 @@ class PlayGame:
         # Disables stats button
         self.stats_button.config(state=DISABLED)
 
-        RoundStats(self)
+        RoundStats(self, self.ans_correct, self.history)
 
 
     def quit_game(self):
@@ -372,8 +389,15 @@ class Hints:
 
 
 class RoundStats:
-    def __init__(self, partner):
+    def __init__(self, partner, round_ans_correct, round_history):
         """ Opens a GUI to show the stats and the export results button """
+
+        # convert variables to self so they can be used throughout the class
+        self.round_ans_correct = round_ans_correct
+        self.round_history = round_history
+
+        print(f"{self.round_ans_correct}\n{self.round_history}")
+
         # Create a box to hold all the boxes in the stats GUI
         self.stats_box = Toplevel()
 
@@ -415,9 +439,25 @@ class RoundStats:
         self.stats_nav_frame.grid(row=2)
 
         # Create button to close stats
-        self.stats_return_button = Button(self.stats_nav_frame, text="Return", width=20, bg="#229afd",
+        self.stats_return_button = Button(self.stats_nav_frame, text="Return", width=15, bg="#229afd",
                                           command=lambda: self.close_stats(partner), font="Arial 20")
-        self.stats_return_button.grid(row=0, column=0)
+        self.stats_return_button.grid(row=0, column=0, padx=5, pady=5)
+
+        self.display_results()
+
+
+    def display_results(self):
+        """ this function calculates and displays the results """
+
+        # display the correct "answers right / questions asked"
+        self.ans_correct_label.config(text=f"Answers Correct:\n{self.round_ans_correct}/{len(self.round_history)}")
+
+        # display the correct win rate
+        self.win_rate_label.config(text=f"Win Rate:\n{int((self.round_ans_correct/len(self.round_history)) * 100)}%")
+
+        # create text for the history of the last 5 questions in the section of the stats page
+
+
 
 
     def close_stats(self, partner):
