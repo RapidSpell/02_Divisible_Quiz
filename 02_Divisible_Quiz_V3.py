@@ -169,8 +169,8 @@ class PlayGame:
         # Reference list to make the buttons for the start game Gui
         # Format [frame, text, width, background, command, row, column]
         play_buttons_ref = [
-            [self.true_false_frame, "True", 20, "#54fd81", lambda: self.to_ans_check("t"), 0, 0,],
-            [self.true_false_frame, "False", 20, "#fd7958", lambda: self.to_ans_check("f"), 0, 1,],
+            [self.true_false_frame, "True", 20, "#54fd81", lambda: self.to_ans_check("true"), 0, 0,],
+            [self.true_false_frame, "False", 20, "#fd7958", lambda: self.to_ans_check("false"), 0, 1,],
             [self.nav_frame, "Hints", 20, "#229afd", self.to_hints, 0, 0],
             [self.nav_frame, "Next Question ==>", 20, "#229afd", self.new_round, 0, 1],
             [self.nav_frame, "Stats", 20, "#229afd", self.to_stats, 1, 0],
@@ -250,7 +250,7 @@ class PlayGame:
                     break
 
         # create the question text
-        q_text = f"{self.dividend} Can be divided by {self.divisor}"
+        q_text = f"{self.dividend} / {self.divisor} gives a whole number"
 
         # configure the question label
         self.question_label.config(text=q_text)
@@ -282,27 +282,27 @@ class PlayGame:
             self.next_button.config(text="This is your last round")
 
         # If the user pressed true
-        if response == "t":
+        if response == "true":
             # If the user was correct
             if self.true_false == 0:
-                self.result_label.config(text=f"{self.dividend} CAN be divided by {self.divisor} the answer is {self.result}", bg="#54fd81")
+                self.result_label.config(text=f"{self.dividend} / {self.divisor} is equal to {self.result}", bg="#54fd81")
                 self.ans_correct += 1
                 self.temp_round_history.append("correct")
 
             else:
-                self.result_label.config(text=f"{self.dividend} CANT be divided by {self.divisor} the answer is {self.result}", bg="#fd7958")
+                self.result_label.config(text=f"{self.dividend} / {self.divisor} is equal to {self.result}", bg="#fd7958")
                 self.temp_round_history.append("incorrect")
 
         # If the user pressed false
         else:
             # If the user was correct
             if self.true_false == 1:
-                self.result_label.config(text=f"{self.dividend} CANT be divided by {self.divisor} the answer is {self.result}", bg="#54fd81")
+                self.result_label.config(text=f"{self.dividend} / {self.divisor} is equal to {self.result}", bg="#54fd81")
                 self.ans_correct += 1
                 self.temp_round_history.append("correct")
 
             else:
-                self.result_label.config(text=f"{self.dividend} CAN be divided by {self.divisor} the answer is {self.result}", bg="#fd7958")
+                self.result_label.config(text=f"{self.dividend} / {self.divisor} is equal to {self.result}", bg="#fd7958")
                 self.temp_round_history.append("incorrect")
 
         # add the temp round history to the main history
@@ -394,9 +394,9 @@ class RoundStats:
 
         # convert variables to self so they can be used throughout the class
         self.round_ans_correct = round_ans_correct
-        self.round_history = round_history
 
-        print(f"{self.round_ans_correct}\n{self.round_history}")
+        # reorder the list to show newest first
+        self.round_history = list(reversed(round_history))
 
         # Create a box to hold all the boxes in the stats GUI
         self.stats_box = Toplevel()
@@ -455,9 +455,23 @@ class RoundStats:
         # display the correct win rate
         self.win_rate_label.config(text=f"Win Rate:\n{int((self.round_ans_correct/len(self.round_history)) * 100)}%")
 
-        # create text for the history of the last 5 questions in the section of the stats page
+        # create text variable for the history of the last 5 questions in the section of the stats page
+        history_txt = "History (shows the most recent up to 5 questions):\n"
 
+        # if more than 5 questions answered add the 5 most recent Q&A's
+        if len(self.round_history) > 5:
+            for item in range(0,5):
+                add_txt = f"\nQuestion: {self.round_history[item][0]}\nYour Answer: {self.round_history[item][1]}\nResult: {self.round_history[item][2]}\n"
 
+                history_txt += add_txt
+
+        else:
+            for item in self.round_history:
+                add_txt = f"\nQuestion: {item[0]}\nAnswer: {item[1]}\nResult: {item[2]}\n"
+
+                history_txt += add_txt
+
+        self.history_label.config(text=history_txt)
 
 
     def close_stats(self, partner):
