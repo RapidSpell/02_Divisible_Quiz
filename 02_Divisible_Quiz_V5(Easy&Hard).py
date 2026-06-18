@@ -89,8 +89,11 @@ class StartGame:
         global unlimited
         unlimited = unlimited_mode
 
+        # create list for easy mode  options
+        mode = "hard"
+
         # Sends user to the game gui and sends how many rounds they want to play
-        PlayGame(num_rounds)
+        PlayGame(num_rounds, mode)
 
         # Remove box for number of games select
         root.withdraw()
@@ -98,11 +101,14 @@ class StartGame:
 
 class PlayGame:
 
-    def __init__(self, rounds):
+    def __init__(self, rounds, mode):
         """ create the GUI for the game and set up all the buttons and variables """
 
         # Initialize 'self.' variables
         self.total_rounds = rounds
+
+        if mode == "easy":
+            self.easy_hard = [2,5,10]
 
         # Variable to hold how many rounds have been played
         self.rounds_played = IntVar()
@@ -218,7 +224,7 @@ class PlayGame:
         if unlimited == "n":
             # configure the labels
             self.question_num_label.config(text=f"Question {self.rounds_played.get()} of {self.total_rounds}\n{self.total_rounds - self.rounds_played.get()} Questions left")
-        
+
         else:
             self.question_num_label.config(
                 text=f"You are playing infinite mode")
@@ -227,13 +233,21 @@ class PlayGame:
         # decide if it is going to be true of false
         self.true_false = random.randint(0, 1)
 
-        # Choose number to divide by
-        if self.true_false == 0:
-            self.divisor = random.randint(1, 10)
+        if self.easy_hard == "hard":
+            # Choose number to divide by
+            if self.true_false == 0:
+                self.divisor = random.randint(1, 10)
 
-        # if the question is going to be false divisor cannot be 1 because every whole number is divisible by one
+            # if the question is going to be false divisor cannot be 1 because every whole number is divisible by one
+            else:
+                self.divisor = random.randint(2, 10)
+
         else:
-            self.divisor = random.randint(2, 10)
+            self.divisor = random.choice(self.easy_hard)
+
+
+
+
 
         # if answer is going to be true (true_false = 0) generate a multiple of the divisor for the dividend
         if self.true_false == 0:
