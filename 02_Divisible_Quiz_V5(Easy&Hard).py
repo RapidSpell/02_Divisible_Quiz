@@ -14,20 +14,29 @@ class StartGame:
         Initialise Divisible quiz
         """
 
+        # Initialize variables
+        self.round_mode = ""
+
         # Create frames
         # Create a frame to hold all the buttons on the start game gui
         self.start_frame = Frame(padx=10, pady=10)
         self.start_frame.grid()
 
+        # Create a frame to hold easy and hard buttons
+        self.easy_hard_frame = Frame(self.start_frame)
+        self.easy_hard_frame.grid(row=2, padx=10, pady=10)
+
         # Creates a frame to hold the entry and the play button next to each other within the start_frame
         self.play_button_frame = Frame(self.start_frame)
-        self.play_button_frame.grid(row=2, padx=10, pady=10)
+        self.play_button_frame.grid(row=4)
 
         # Reference list to make the buttons for the start game Gui
         # Format [frame, text, width, row, column, command]
         start_buttons_ref = [
+            [self.easy_hard_frame, "Easy Mode", 19, 0, 0, lambda: self.mode("easy")],
+            [self.easy_hard_frame, "Hard Mode", 19, 0, 1, lambda: self.mode("hard")],
             [self.play_button_frame, "Play Game", 15, 0, 1, self.get_rounds],
-            [self.start_frame, "Unlimited Mode", 39, 3 ,0, lambda: self.to_game("y")],
+            [self.start_frame, "Unlimited Mode", 39, 5 ,0, lambda: self.to_game("y")],
         ]
 
         # Make list to hold all the start buttons after being made to be named after
@@ -40,11 +49,16 @@ class StartGame:
 
             self.start_buttons.append(self.made_button)
 
+        # assign easy and hard button to names
+        self.easy_button = self.start_buttons[0]
+        self.hard_button = self.start_buttons[1]
+
         # Reference list to make the labels for the start game Gui
         # Format [text, font, row]
         start_labels_ref = [
             ["Divisible quiz", "Arial 25 bold", 0],
-            ["How many rounds do you want to play?", "Arial 14", 1],
+            ["Please select game difficulty", "Arial 14", 1],
+            ["How many rounds do you want to play?", "Arial 14", 3]
         ]
 
         # Make list to hold all the start labels after being made to be named after
@@ -56,11 +70,26 @@ class StartGame:
 
             self.start_labels.append(self.made_label)
 
-        self.rounds_label = self.start_labels[1]
+        self.difficulty_label = self.start_labels[1]
+        self.rounds_label = self.start_labels[2]
 
         # Creates the entry box to get the number of rounds the user wants to play
         self.rounds_input = Entry(self.play_button_frame, font="Arial 19", width=20)
         self.rounds_input.grid(row=0)
+
+
+    def mode(self, mode_type):
+        """ sets the mode and updates the buttons """
+        # create a self variable to save the current difficulty selection
+        self.round_mode = mode_type
+
+        if mode_type == "easy":
+            self.easy_button.config(bg="#229afd")
+            self.hard_button.config(bg="#6b6b6b")
+
+        else:
+            self.easy_button.config(bg="#6b6b6b")
+            self.hard_button.config(bg="#229afd")
 
 
     def get_rounds(self):
@@ -89,14 +118,19 @@ class StartGame:
         global unlimited
         unlimited = unlimited_mode
 
-        # create list for easy mode  options
-        mode = "hard"
+        if self.round_mode != "":
+            # set the difficulty back to the normal background
+            self.difficulty_label.config(bg="#f0f0f0")
 
-        # Sends user to the game gui and sends how many rounds they want to play
-        PlayGame(num_rounds, mode)
+            # Sends user to the game gui and sends how many rounds they want to play
+            PlayGame(num_rounds, self.round_mode)
 
-        # Remove box for number of games select
-        root.withdraw()
+            # Remove box for number of games select
+            root.withdraw()
+
+        else:
+            # if the user hasn't selected a difficulty set the label to red to indicate that it has not been selected
+            self.difficulty_label.config(bg="#fd7958")
 
 
 class PlayGame:
@@ -107,8 +141,7 @@ class PlayGame:
         # Initialize 'self.' variables
         self.total_rounds = rounds
 
-        if mode == "easy":
-            self.easy_hard = [2,5,10]
+        self.easy_hard = mode
 
         # Variable to hold how many rounds have been played
         self.rounds_played = IntVar()
@@ -218,8 +251,6 @@ class PlayGame:
         # add one to rounds played
         self.rounds_played.set(self.rounds_played.get() + 1)
 
-
-
         # setup questions left label if not in unlimited mode
         if unlimited == "n":
             # configure the labels
@@ -243,11 +274,8 @@ class PlayGame:
                 self.divisor = random.randint(2, 10)
 
         else:
-            self.divisor = random.choice(self.easy_hard)
-
-
-
-
+            # set the divisor to a number that will give easy questions
+            self.divisor = random.choice([2, 5, 10])
 
         # if answer is going to be true (true_false = 0) generate a multiple of the divisor for the dividend
         if self.true_false == 0:

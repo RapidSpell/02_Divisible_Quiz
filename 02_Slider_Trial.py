@@ -13,6 +13,9 @@ class StartGame:
         Initialise Divisible quiz
         """
 
+        # Initialize variables
+        self.round_mode = ""
+
         # Create frames
         # Create a frame to hold all the buttons on the start game gui
         self.start_frame = Frame(padx=10, pady=10)
@@ -24,15 +27,15 @@ class StartGame:
 
         # Creates a frame to hold the entry and the play button next to each other within the start_frame
         self.play_button_frame = Frame(self.start_frame)
-        self.play_button_frame.grid(row=3)
+        self.play_button_frame.grid(row=4)
 
         # Reference list to make the buttons for the start game Gui
         # Format [frame, text, width, row, column, command]
         start_buttons_ref = [
-            [self.easy_hard_frame, "Easy Mode", 15, 0, 0, lambda: self.mode("easy")],
-            [],
+            [self.easy_hard_frame, "Easy Mode", 19, 0, 0, lambda: self.mode("easy")],
+            [self.easy_hard_frame, "Hard Mode", 19, 0, 1, lambda: self.mode("hard")],
             [self.play_button_frame, "Play Game", 15, 0, 1, self.get_rounds],
-            [self.start_frame, "Unlimited Mode", 39, 4 ,0, lambda: self.to_game("y")],
+            [self.start_frame, "Unlimited Mode", 39, 5 ,0, lambda: self.to_game("y")],
         ]
 
         # Make list to hold all the start buttons after being made to be named after
@@ -45,11 +48,16 @@ class StartGame:
 
             self.start_buttons.append(self.made_button)
 
+        # assign easy and hard button to names
+        self.easy_button = self.start_buttons[0]
+        self.hard_button = self.start_buttons[1]
+
         # Reference list to make the labels for the start game Gui
         # Format [text, font, row]
         start_labels_ref = [
             ["Divisible quiz", "Arial 25 bold", 0],
-            ["How many rounds do you want to play?", "Arial 14", 1],
+            ["Please select game difficulty", "Arial 14", 1],
+            ["How many rounds do you want to play?", "Arial 14", 3]
         ]
 
         # Make list to hold all the start labels after being made to be named after
@@ -61,7 +69,8 @@ class StartGame:
 
             self.start_labels.append(self.made_label)
 
-        self.rounds_label = self.start_labels[1]
+        self.difficulty_label = self.start_labels[1]
+        self.rounds_label = self.start_labels[2]
 
         # Creates the entry box to get the number of rounds the user wants to play
         self.rounds_input = Entry(self.play_button_frame, font="Arial 19", width=20)
@@ -70,6 +79,16 @@ class StartGame:
 
     def mode(self, mode_type):
         """ sets the mode and updates the buttons """
+        # create a self variable to save the current difficulty selection
+        self.round_mode = mode_type
+
+        if mode_type == "easy":
+            self.easy_button.config(bg="#229afd")
+            self.hard_button.config(bg="#6b6b6b")
+
+        else:
+            self.easy_button.config(bg="#6b6b6b")
+            self.hard_button.config(bg="#229afd")
 
 
     def get_rounds(self):
@@ -98,10 +117,11 @@ class StartGame:
         global unlimited
         unlimited = unlimited_mode
 
-        # create list for easy mode  options
-        mode = "hard"
+        # Sends user to the game gui and sends how many rounds they want to play
+        PlayGame(num_rounds, mode)
 
-        print(mode)
+        # Remove box for number of games select
+        root.withdraw()
 
 
 # Create global variable to hold if the game is currently in infinite mode
