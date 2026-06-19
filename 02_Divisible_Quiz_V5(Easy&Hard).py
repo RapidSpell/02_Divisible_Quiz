@@ -1,6 +1,7 @@
 from tkinter import *
 import random
 from functools import partial
+from datetime import date
 
 
 # Classes start here
@@ -105,12 +106,12 @@ class StartGame:
 
             else:
                 # If the user inputs an invalid integer change the text and text colour of the label to indicate there is an issue
-                self.rounds_label.config(text="Please enter an integer between 0 and 100", fg="#fd7958")
+                self.rounds_label.config(text="Please enter an integer between 1 and 100", fg="#fd7958")
 
 
         except ValueError:
             # If the user inputs an invalid integer change the text and text colour of the label to indicate there is an issue
-            self.rounds_label.config(text="Please enter an integer between 0 and 100", fg="#fd7958")
+            self.rounds_label.config(text="Please enter an integer between 1 and 100", fg="#fd7958")
 
 
     def to_game(self, unlimited_mode, num_rounds=0):
@@ -438,6 +439,11 @@ class RoundStats:
         # convert variables to self so they can be used throughout the class
         self.round_ans_correct = round_ans_correct
 
+        # create variables to store the text for the labels and exporting
+        self.ans_correct_txt = ""
+        self.win_rate_txt = ""
+        self.history_txt = ""
+
         # reorder the list to show newest first
         self.round_history = list(reversed(round_history))
 
@@ -486,35 +492,65 @@ class RoundStats:
                                           command=lambda: self.close_stats(partner), font="Arial 20")
         self.stats_return_button.grid(row=0, column=0, padx=5, pady=5)
 
+        # Create an export stats button
+        self.export_button = Button(self.stats_nav_frame, text="Export", width=15, bg="#229afd",
+                                    command=self.export_stats, font="Arial 20")
+        self.export_button.grid(row=0, column=1, padx=5, pady=5)
+
         self.display_results()
 
 
     def display_results(self):
         """ this function calculates and displays the results """
+        # create new labels using the variables
+        self.ans_correct_txt = f"Answers Correct:\n{self.round_ans_correct}/{len(self.round_history)}"
 
-        # display the correct "answers right / questions asked"
-        self.ans_correct_label.config(text=f"Answers Correct:\n{self.round_ans_correct}/{len(self.round_history)}")
+        self.win_rate_txt = f"Win Rate:\n{int((self.round_ans_correct/len(self.round_history)) * 100)}%"
 
-        # display the correct win rate
-        self.win_rate_label.config(text=f"Win Rate:\n{int((self.round_ans_correct/len(self.round_history)) * 100)}%")
-
-        # create text variable for the history of the last 5 questions in the section of the stats page
-        history_txt = "History (shows the most recent up to 5 questions):\n"
+        self.history_txt = "History (shows the most recent up to 5 questions):\n"
 
         # if more than 5 questions answered add the 5 most recent Q&A's
         if len(self.round_history) > 5:
-            for item in range(0,5):
+            for item in range(0, 5):
                 add_txt = f"\nQuestion: {self.round_history[item][0]}\nYour Answer: {self.round_history[item][1]}\nResult: {self.round_history[item][2]}\n"
 
-                history_txt += add_txt
+                self.history_txt += add_txt
 
         else:
             for item in self.round_history:
                 add_txt = f"\nQuestion: {item[0]}\nAnswer: {item[1]}\nResult: {item[2]}\n"
 
-                history_txt += add_txt
+                self.history_txt += add_txt
 
-        self.history_label.config(text=history_txt)
+        # display the correct "answers right / questions asked"
+        self.ans_correct_label.config(text=self.ans_correct_txt)
+
+        # display the correct win rate
+        self.win_rate_label.config(text=self.win_rate_txt)
+
+        # display the history
+        self.history_label.config(text=self.history_txt)
+
+
+    def export_stats(self):
+        """ exports the stats to a text file """
+        # Get current date for heading and filename
+        today = date.today()
+
+        # Get day, month and year as individual strings
+        day = today.strftime("%d")
+        month = today.strftime("%m")
+        year = today.strftime("%Y")
+
+        # file_name = f"temperatures_{day}_{month}_{year}"
+        file_name = f"Divisible_Quiz_Results_{day}_{month}_{year}"
+
+        write_to = f"{file_name}.txt"
+
+        # add the heading and stats to the text file
+        with open(write_to, "w") as text_file:
+            text_file.write("***** Divisible Quiz Results *****\n\n\n")
+            text_file.write(f"{self.ans_correct_txt}\n\n{self.win_rate_txt}\n\n{self.history_txt}")
 
 
     def close_stats(self, partner):
